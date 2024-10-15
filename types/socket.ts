@@ -1,10 +1,13 @@
 import { ClassSettings, Room, RoomStatus } from './room'
 import { User } from './user'
+import { ElementType } from './element'
 
 interface ServerToClientEvents {
+    updateUser: (socketId: string) => void,
     roomCreated: (room: Room) => void
     roomError: (error: string) => void
     updateRoom: (room: Room) => void
+    updateElements: (action: ElementType[] | ((prev: ElementType[]) => ElementType[]),overwrite:boolean) => void
     loading: (message: string) => void
     basicEmit: (a: number, b: string, c: Buffer) => void
     withAck: (d: string, callback: (e: number) => void) => void
@@ -28,6 +31,7 @@ interface ServerToClientEvents {
     //   progress: Progress,
     //   callback: (res: Response<Room>) => void
     // ) => void
+    updateElements: (action: ElementType[] | ((prev: ElementType[]) => ElementType[]),roomId:string,overwrite:boolean) => void
     endClass: (roomId: string, callback: (res: Response<Room>) => void) => void
   }
   

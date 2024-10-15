@@ -1,8 +1,8 @@
 import { Server } from 'socket.io'
 import {Room,RoomStatus} from './types/room'
-
 import { ClientToServerEvents,InterServerEvents,ServerToClientEvents,SocketData } from './types/socket'
 import generateRandomCode from './utils/generateRandomCode'
+import Class from './models/room';
 
 const Socket = (io: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>) => {
     const rooms: Map<string,Room> = new Map()
@@ -10,11 +10,15 @@ const Socket = (io: Server<ClientToServerEvents, ServerToClientEvents, InterServ
     io.on('connection', (socket) => {
         const id = socket.id;
         socket.join(id);
-        console.log('SOMEONE JOINED' + id);
-
+        console.log('SOMEONE CONNECTED WITH THE SERVER ' + id + " (scoketId) 🔥");
+        socket.emit('updateUser',(id));
+        // Sending socketId
+        // socket.emit('updateUser',socket.id);
         // Room creation
-        socket.on('createRoom', (user,settings,callback) => {
+        socket.on('createRoom', async (user,settings,callback) => {
+            console.log(user);
             let roomId = generateRandomCode();
+            console.log("New Room ", roomId);
             while(rooms.has(roomId)){
                 roomId = generateRandomCode();
             }
@@ -31,15 +35,18 @@ const Socket = (io: Server<ClientToServerEvents, ServerToClientEvents, InterServ
             socket.join(roomId);
             console.log(`Room ${roomId} created by ${socket.id}`);
             rooms.set(roomId,room);
+            const newRoom = new Class({roomId,elements:[]});
+            await newRoom.save();
             callback({
                 success: true,
                 data: room
             })
         })
         // JoinRoom 
-        socket.on('joinRoom',(roomId,user,callback) => {
+        socket.on('joinRoom', async (roomId,user,callback) => { 
             if(rooms.has(roomId)){
                 const room = rooms.get(roomId)!
+                // console.log(room);
                 if(room.users.length >= 100){
                     //  Room full
                     callback({
@@ -52,8 +59,15 @@ const Socket = (io: Server<ClientToServerEvents, ServerToClientEvents, InterServ
                         rooms.set(roomId,room); // updating the room with the new user
                         socket.join(roomId);
                     }
+                    const existingClass = await Class.findOne({roomId}); 
+                    console.log(existingClass);
+                    callback({
+                        success: true,
+                        data: existingClass?.elements
+                    })
                 }
             }else{
+                console.log("Room not found");
                 callback({
                     success: false,
                     error: new Error('Room with this ID does not exist')
@@ -84,7 +98,7 @@ const Socket = (io: Server<ClientToServerEvents, ServerToClientEvents, InterServ
             }else{
                 callback({
                     success: false,
-                    error: new Error(`Room with this Id does not exist`);
+                    error: new Error(`Room with this Id does not exist`)
                 })
             }
         })
@@ -128,6 +142,16 @@ const Socket = (io: Server<ClientToServerEvents, ServerToClientEvents, InterServ
             }
         })
         // UpdateElements
+        socket.on('updateElements',async (action,roomId,overwrite=false) => {
+            console.log("Server : ",action);
+            // socket.broadcast.emit(action,overwrite);
+            // action is the screenshot that comes in so same that screenshot
+            socket.to(roomId).emit('updateElements',action,overwrite);
+            // update the database realted to this room
+            await Class.findOneAndUpdate({roomId},{
+                elements: action
+            });
+        })
         const handleDisconnect = (socketId: string) => {
             for (const [roomId, room] of rooms.entries()) {
                 const updatedUsers = room.users.filter((u) => u.socketId !== socketId)

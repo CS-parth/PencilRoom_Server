@@ -31,6 +31,5 @@ export interface Room {
   classSettings: ClassSettings
   status: RoomStatus
   createdAt: Date,
-  // elements,
   timer: number
 }
