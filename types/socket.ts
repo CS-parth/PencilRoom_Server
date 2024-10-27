@@ -20,7 +20,7 @@ interface ServerToClientEvents {
   }
   
   interface ClientToServerEvents {
-    createRoom: (user: User, settings: ClassSettings, callback: (res: Response<Room>) => void) => void
+    createRoom: (user: User, settings: ClassSettings,elements: ElementType[], callback: (res: Response<Room>) => void) => void
     joinRoom: (roomId: string, user: User, callback: (res: Response<Room>) => void) => void
     exitRoom: (roomId: string, callback: (res: Response<Room>) => void) => void
     startClass: (roomId: string, paragraph: string, callback: (res: Response<Room>) => void) => void

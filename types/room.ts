@@ -1,4 +1,5 @@
 // import { GameDifficulties, GameDuration, GameModes } from './class'
+import { ElementType } from './element'
 import { User } from './user'
 
 export interface ClassSettings {
@@ -29,6 +30,7 @@ export interface Room {
 //     value: Progress
 //   }[]
   classSettings: ClassSettings
+  elements: ElementType[]
   status: RoomStatus
   createdAt: Date,
   timer: number

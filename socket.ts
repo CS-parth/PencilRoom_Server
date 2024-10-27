@@ -15,7 +15,7 @@ const Socket = (io: Server<ClientToServerEvents, ServerToClientEvents, InterServ
         // Sending socketId
         // socket.emit('updateUser',socket.id);
         // Room creation
-        socket.on('createRoom', async (user,settings,callback) => {
+        socket.on('createRoom', async (user,settings,elements,callback) => {
             console.log(user);
             let roomId = generateRandomCode();
             console.log("New Room ", roomId);
@@ -29,13 +29,13 @@ const Socket = (io: Server<ClientToServerEvents, ServerToClientEvents, InterServ
                 classSettings: settings,
                 status: RoomStatus.WAITING,
                 createdAt: new Date(),
-                // elements,
+                elements: elements,
                 timer: 0
             }
             socket.join(roomId);
             console.log(`Room ${roomId} created by ${socket.id}`);
             rooms.set(roomId,room);
-            const newRoom = new Class({roomId,elements:[]});
+            const newRoom = new Class({roomId,elements:elements});
             await newRoom.save();
             callback({
                 success: true,
