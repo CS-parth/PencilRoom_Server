@@ -11,7 +11,7 @@ import { Server } from 'socket.io';
 import Socket from './socket';
 const io = new Server(server, {
     cors: {
-        origin: ['http://localhost:5173','http://localhost:5174'],
+        origin: ['http://localhost:5173','http://localhost:5174','https://pencil-room-client.vercel.app'],
         methods: ['GET','POST']
     }
 })
@@ -19,7 +19,7 @@ Socket(io);
 // cors
 import cors from 'cors'
 app.use(cors({
-    origin: ['http://localhost:5173','http://localhost:5174'],
+    origin: ['http://localhost:5173','http://localhost:5174','https://pencil-room-client.vercel.app'],
     methods: ['GET','POST']
 }));
 // dotenv
