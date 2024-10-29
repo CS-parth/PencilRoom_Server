@@ -4,7 +4,8 @@ import bodyParser from 'body-parser';
 const port = 6600;
 import dotenv from 'dotenv';
 import { stablishConnection } from './db/connection';
-
+import { exec } from 'child_process';
+import schedule from 'node-schedule';
 import { createServer } from 'node:http'; // createServer is from node:http
 const server = createServer(app); // app is a callback function used to make servers {ie: http or https}
 import { Server } from 'socket.io';
@@ -26,6 +27,17 @@ app.use(cors({
 dotenv.config();
 // stablish connection
 stablishConnection();
+// warming the server
+app.get("/warm",(req,res)=>{
+    res.send("I'm here to keep the server warm");
+})
+const job = schedule.scheduleJob('* */14 * * * *', function(){ // sending request in every 14 min
+    // Send a request 
+    if(process.env.NODE_ENV == 'production'){
+        exec('./scripts/warm.sh',(err,stdout,stderr)=>{})
+    }
+});
+
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json

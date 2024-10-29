@@ -1,0 +1,1 @@
+curl https://pencilroom-server.onrender.com/warm
