@@ -1,1 +1,1 @@
-curl https://pencilroom-server-oj5s.onrender.com/warm
+curl https://pencilroom-server-oj5s.onrender.com
